@@ -52,3 +52,8 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# custom
+.DS_Store
+,_.DS_Store
+nbproject/
