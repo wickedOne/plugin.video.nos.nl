@@ -17,6 +17,7 @@ image_base_url = 'http://nos.nl/bundles/nossite/img/programs/'
 
 # settings
 quality = xbmcaddon.Addon().getSetting('quality')
+limit = int(float(xbmcaddon.Addon().getSetting('limit')))
 addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 mode = args.get('mode', None)
@@ -47,7 +48,7 @@ def addDir(location, name, folder, mode, ic, tot):
 if mode is None:
     html = urllib2.urlopen(overview_url).read().replace('\n', '')
     folders = re.findall(re_folder, html)
-    
+
     for folder in folders:
         addDir(folder[0], folder[1], 1, 'section', None, len(folders))
 
@@ -56,7 +57,7 @@ if mode is None:
 elif mode[0] == 'section':
     html = urllib2.urlopen(base_url + loc[0]).read().replace('\n', '')
     items = re.findall(re_item, html)
-    for item in items:
+    for item in items[:limit]:
         dt = datetime(int(item[2]), int(item[3]), int(item[4]), int(item[5]), int(item[6]))
 
         # unfortunately nos.nl uses inconsistent file names for their video streams
@@ -65,6 +66,6 @@ elif mode[0] == 'section':
         source = re.findall(re_source, item_html)
 
         if source:
-            addDir(source[0], args['name'][0] + ' - ' + dt.strftime("%A, %d. %B %Y %I:%M%p"), 0, 'item', args['icon'][0], len(items))
+            addDir(source[0], args['name'][0] + ' - ' + dt.strftime("%A, %d. %B %Y %I:%M%p"), 0, 'item', args['icon'][0], len(items[:limit]))
 
     xbmcplugin.endOfDirectory(addon_handle)
