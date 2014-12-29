@@ -20,3 +20,11 @@ msgstr "Video configuratie"
 msgctxt "#33002"
 msgid "Quality"
 msgstr "Kwaliteit"
+
+msgctxt "#33003"
+msgid "Content configuratie"
+msgstr ""
+
+msgctxt "#33004"
+msgid "Items per categorie"
+msgstr ""

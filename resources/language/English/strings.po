@@ -20,3 +20,11 @@ msgstr ""
 msgctxt "#33002"
 msgid "Quality"
 msgstr ""
+
+msgctxt "#33003"
+msgid "Content settings"
+msgstr ""
+
+msgctxt "#33004"
+msgid "Items per category"
+msgstr ""
