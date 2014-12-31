@@ -32,40 +32,49 @@ re_source = re.compile('<source src="([^"]+)" type="' + quality + '"')
 def build_url(query):
     return plugin_url + '?' + urllib.urlencode(query)
 
-def addDir(location, name, folder, mode, ic, tot):
+def addDir(location, name, folder, mode, ic, tot, info):
     if ic is None:
         ic = image_base_url + name.lower().replace(' ', '-') + '.jpg'
+    li = xbmcgui.ListItem(name, iconImage=ic)
 
     if mode == 'section':
         url = build_url({'mode': mode, 'location': location, 'icon': ic, 'name': name})
     elif mode == 'item':
         url = location
 
-    li = xbmcgui.ListItem(name, iconImage=ic)
+    if info != None:
+        li.setInfo('video', info)
+
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=folder, totalItems=tot)
 
+def getHtml(url):
+    req = urllib2.Request(url)
+    req.add_header('User-Agent', 'Mozilla/4.0 (compatible; MSIE 5.5; Windows 98; Crazy Browser 1.x.x)')
+
+    return urllib2.urlopen(req).read().replace('\n', '')
 
 if mode is None:
-    html = urllib2.urlopen(overview_url).read().replace('\n', '')
+    html = getHtml(overview_url + '/')
     folders = re.findall(re_folder, html)
 
     for folder in folders:
-        addDir(folder[0], folder[1], 1, 'section', None, len(folders))
+        addDir(folder[0], folder[1], 1, 'section', None, len(folders), None)
 
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'section':
-    html = urllib2.urlopen(base_url + loc[0]).read().replace('\n', '')
+    html = getHtml(base_url + loc[0])
     items = re.findall(re_item, html)
+
     for item in items[:limit]:
         dt = datetime(int(item[2]), int(item[3]), int(item[4]), int(item[5]), int(item[6]))
 
         # unfortunately nos.nl uses inconsistent file names for their video streams
         # so we need to parse each item page in order to retrieve the proper source
-        item_html = urllib2.urlopen(base_url + item[0]).read().replace('\n', '')
+        item_html = getHtml(base_url + item[0])
         source = re.findall(re_source, item_html)
 
         if source:
-            addDir(source[0], args['name'][0] + ' - ' + dt.strftime("%A, %d. %B %Y %I:%M%p"), 0, 'item', args['icon'][0], len(items[:limit]))
+            addDir(source[0], dt.strftime("%A, %d %B %Y %I:%M%p"), 0, 'item', args['icon'][0], len(items[:limit]), {'aired': dt.strftime("%Y-%m-%d")})
 
     xbmcplugin.endOfDirectory(addon_handle)
