@@ -3,7 +3,7 @@
     <category label="33001">
         <setting label="33002" type="labelenum" id="quality" values="720p|480p|360p" default="720p"/>
     </category>
-    <category label="32003">
-        <setting label="32004" type="slider" id="limit" default="20" range="0,20" option="int" />
+    <category label="33003">
+        <setting label="33004" type="slider" id="limit" default="20" range="0,20" option="int" />
     </category>
 </settings>

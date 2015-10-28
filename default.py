@@ -25,8 +25,8 @@ loc = args.get('location', None)
 xbmcplugin.setContent(addon_handle, 'episodes')
 
 # regular expressions
-re_folder = re.compile('<li class="broadcast-list__item[^"]+">[^<]?<a href="([^"]+)" class="[^"]+"><div class="broadcast-link__wrapper[^"]{0,}"><span class="broadcast-link__play img-icon-play"></span><span class="broadcast-link__name[^"]{0,}">([^<]+)</span>')
-re_item = re.compile('<li class="broadcast-player__playlist__item"><a href="([^"]+)" class="[^"]+"><span class="[^"]+"></span><span class="broadcast-link__name[^"]{0,}">([^<]+)</span><time class="[^"]+" datetime="([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]+):([0-9]+):[^"]+">')
+re_folder = re.compile('<li class="broadcast-list__item[^"]+">[^<]?<a href="([^"]+)" class="[^"]+"[^>]{0,}><div class="broadcast-link__wrapper[^"]{0,}"><span class="broadcast-link__play img-icon-play"></span><span class="broadcast-link__name[^"]{0,}">([^<]+)</span>')
+re_item = re.compile('<li class="broadcast-player__playlist__item"><a href="([^"]+)" class="[^"]+"[^>]{0,}><span class="[^"]+"></span><span class="broadcast-link__name[^"]{0,}">([^<]+)</span><time class="[^"]+" datetime="([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]+):([0-9]+):[^"]+">')
 re_source = re.compile('<source src="([^"]+)" type="' + quality + '"')
 
 def build_url(query):
@@ -49,7 +49,7 @@ def addDir(location, name, folder, mode, ic, tot, info):
 
 def getHtml(url):
     req = urllib2.Request(url)
-    req.add_header('User-Agent', 'Mozilla/4.0 (compatible; MSIE 5.5; Windows 98; Crazy Browser 1.x.x)')
+    req.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:40.0) Gecko/20100101 Firefox/40.0')
 
     return urllib2.urlopen(req).read().replace('\n', '')
 
