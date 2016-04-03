@@ -6,12 +6,14 @@ import re
 import urllib
 import urllib2
 import urlparse
+import json
 
 from datetime import datetime, date, time
 
 # uris
 plugin_url = sys.argv[0]
 base_url = 'http://nos.nl'
+secure_url = 'http://nos.nl/video/resolve/'
 overview_url = 'http://nos.nl/uitzendingen'
 image_base_url = 'http://nos.nl/bundles/nossite/img/programs/'
 
@@ -66,12 +68,21 @@ def getHtml(url):
 
     return urllib2.urlopen(req).read().replace('\n', '')
 
+def secureItem(location):
+    req = urllib2.Request(secure_url, '[{"file": "' + location + '"}]')
+    response = urllib2.urlopen(req).read()
+    response_json = json.loads(response)
+
+    return response_json[0]['file']
+
 def playItem(location):
-    xbmc.log(location[0])
     item_html = getHtml(base_url + location)
     videos = re.findall(re_source, item_html)
     
     for video in videos:
+        if video.find('content-ip'):
+            video = secureItem(video)
+
         listItem = xbmcgui.ListItem(path=video)
         listItem.setProperty('IsPlayable', 'true')
         
