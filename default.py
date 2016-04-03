@@ -32,6 +32,19 @@ re_source = re.compile('<source src="([^"]+)" type="' + quality + '"')
 def build_url(query):
     return plugin_url + '?' + urllib.urlencode(query)
 
+def addLink(location, name, folder, mode, ic, tot, info):
+    if ic is None:
+        ic = image_base_url + name.lower().replace(' ', '-') + '.jpg'
+
+    li = xbmcgui.ListItem(name, iconImage=ic)
+    li.setProperty('IsPlayable', 'true')
+
+    if info != None:
+        li.setInfo('video', info)
+
+    url = build_url({'mode': mode, 'location': location})
+    xbmcplugin.addDirectoryItem(addon_handle, url=url, listitem=li, isFolder=folder)
+
 def addDir(location, name, folder, mode, ic, tot, info):
     if ic is None:
         ic = image_base_url + name.lower().replace(' ', '-') + '.jpg'
@@ -53,6 +66,17 @@ def getHtml(url):
 
     return urllib2.urlopen(req).read().replace('\n', '')
 
+def playItem(location):
+    xbmc.log(location[0])
+    item_html = getHtml(base_url + location)
+    videos = re.findall(re_source, item_html)
+    
+    for video in videos:
+        listItem = xbmcgui.ListItem(path=video)
+        listItem.setProperty('IsPlayable', 'true')
+        
+        xbmcplugin.setResolvedUrl(addon_handle, True, listItem)
+
 if mode is None:
     html = getHtml(overview_url + '/')
     folders = re.findall(re_folder, html)
@@ -68,13 +92,11 @@ elif mode[0] == 'section':
 
     for item in items[:limit]:
         dt = datetime(int(item[2]), int(item[3]), int(item[4]), int(item[5]), int(item[6]))
+        addLink(item[0], dt.strftime("%A, %d %B %Y %I:%M%p"), 0, 'item', args['icon'][0], len(items[:limit]), {'aired': dt.strftime("%Y-%m-%d")})
 
-        # unfortunately nos.nl uses inconsistent file names for their video streams
-        # so we need to parse each item page in order to retrieve the proper source
-        item_html = getHtml(base_url + item[0])
-        source = re.findall(re_source, item_html)
+    xbmcplugin.endOfDirectory(addon_handle)
 
-        if source:
-            addDir(source[0], dt.strftime("%A, %d %B %Y %I:%M%p"), 0, 'item', args['icon'][0], len(items[:limit]), {'aired': dt.strftime("%Y-%m-%d")})
+elif mode[0] == 'item':
+    playItem(loc[0])
 
     xbmcplugin.endOfDirectory(addon_handle)
