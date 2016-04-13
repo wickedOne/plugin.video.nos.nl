@@ -80,7 +80,7 @@ def playItem(location):
     videos = re.findall(re_source, item_html)
     
     for video in videos:
-        if video.find('content-ip'):
+        if video.find('content-ip') > -1:
             video = secureItem(video)
 
         listItem = xbmcgui.ListItem(path=video)
