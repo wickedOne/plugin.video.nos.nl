@@ -29,7 +29,7 @@ xbmcplugin.setContent(addon_handle, 'episodes')
 # regular expressions
 re_folder = re.compile('<li class="broadcast-list__item[^"]+">[^<]?<a href="([^"]+)" class="[^"]+"[^>]{0,}><div class="broadcast-link__wrapper[^"]{0,}"><span class="broadcast-link__play img-icon-play"></span><span class="broadcast-link__name[^"]{0,}">([^<]+)</span>')
 re_item = re.compile('<li class="broadcast-player__playlist__item"><a href="([^"]+)" class="[^"]+"[^>]{0,}><span class="[^"]+"></span><span class="broadcast-link__name[^"]{0,}">([^<]+)</span><time class="[^"]+" datetime="([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]+):([0-9]+):[^"]+">')
-re_source = re.compile('<source src="([^"]+)" type="' + quality + '"')
+re_source = re.compile('<source src="([^"]+)" type="video/mp4" data-label="[A-Za-z]+ - ' + quality + '"')
 
 def build_url(query):
     return plugin_url + '?' + urllib.urlencode(query)
