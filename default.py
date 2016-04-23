@@ -30,6 +30,7 @@ xbmcplugin.setContent(addon_handle, 'episodes')
 re_folder = re.compile('<li class="broadcast-list__item[^"]+">[^<]?<a href="([^"]+)" class="[^"]+"[^>]{0,}><div class="broadcast-link__wrapper[^"]{0,}"><span class="broadcast-link__play img-icon-play"></span><span class="broadcast-link__name[^"]{0,}">([^<]+)</span>')
 re_item = re.compile('<li class="broadcast-player__playlist__item"><a href="([^"]+)" class="[^"]+"[^>]{0,}><span class="[^"]+"></span><span class="broadcast-link__name[^"]{0,}">([^<]+)</span><time class="[^"]+" datetime="([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]+):([0-9]+):[^"]+">')
 re_source = re.compile('<source src="([^"]+)" type="video/mp4" data-label="[A-Za-z]+ - ' + quality + '"')
+re_content_length = re.compile('Content-Length: ([0-9]+)')
 
 def build_url(query):
     return plugin_url + '?' + urllib.urlencode(query)
@@ -68,24 +69,45 @@ def getHtml(url):
 
     return urllib2.urlopen(req).read().replace('\n', '')
 
+# for sports related streams an additional ip check is required.
 def secureItem(location):
-    req = urllib2.Request(secure_url, '[{"file": "' + location + '"}]')
-    response = urllib2.urlopen(req).read()
-    response_json = json.loads(response)
-
-    return response_json[0]['file']
+    if location.find('content-ip') > -1:
+        req = urllib2.Request(secure_url, '[{"file": "' + location + '"}]')
+        response = urllib2.urlopen(req).read()
+        response_json = json.loads(response)
+    
+        return response_json[0]['file']
+        
+    return location
+    
+# check item for content length and fallback to a backup stream if necessary
+def validateItem(location):
+    request = urllib2.Request(location)
+    request.get_method = lambda : 'HEAD'
+    
+    response = urllib2.urlopen(request)
+    headers = response.info().headers
+    
+    for header in headers:
+        matches = re.findall(re_content_length, header)
+        
+        for match in matches:
+            if int(match[0]) == 0 and location.find('_backup.mp4') == -1:
+                return location.replace('.mp4', '_backup.mp4')
+                
+    return location
 
 def playItem(location):
     item_html = getHtml(base_url + location)
     videos = re.findall(re_source, item_html)
     
     for video in videos:
-        if video.find('content-ip') > -1:
-            video = secureItem(video)
-
+        video = secureItem(video)
+        video = validateItem(video)
+        
         listItem = xbmcgui.ListItem(path=video)
         listItem.setProperty('IsPlayable', 'true')
-        
+
         xbmcplugin.setResolvedUrl(addon_handle, True, listItem)
 
 if mode is None:
