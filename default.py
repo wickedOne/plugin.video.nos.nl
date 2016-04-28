@@ -92,8 +92,11 @@ def validateItem(location):
         matches = re.findall(re_content_length, header)
         
         for match in matches:
-            if int(match[0]) == 0 and location.find('_backup.mp4') == -1:
-                return location.replace('.mp4', '_backup.mp4')
+            if int(match[0]) == 0:
+                if location.find('_backup.mp4') == -1:
+                    return location.replace('.mp4', '_backup.mp4')
+                
+                return location.replace('_backup.mp4', '.mp4')
                 
     return location
 
