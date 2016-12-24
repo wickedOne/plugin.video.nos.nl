@@ -15,7 +15,7 @@ plugin_url = sys.argv[0]
 base_url = 'http://nos.nl'
 secure_url = 'http://nos.nl/video/resolve/'
 overview_url = 'http://nos.nl/uitzendingen'
-image_base_url = 'http://nos.nl/bundles/nossite/img/programs/'
+image_base_url = 'http://s.nos.nl/img/broadcast-content/programs/'
 
 # settings
 quality = xbmcaddon.Addon().getSetting('quality')
