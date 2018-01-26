@@ -70,13 +70,8 @@ def getHtml(url):
     return urllib2.urlopen(req).read().replace('\n', '')
 
 # for sports related streams an additional ip check is required.
+# deprecated: currently resolved through redirects
 def secureItem(location):
-    if location.find('content-ip') > -1:
-        req = urllib2.Request(secure_url, '[{"file": "' + location + '"}]')
-        response = urllib2.urlopen(req).read()
-        response_json = json.loads(response)
-    
-        return response_json[0]['file']
         
     return location
     
